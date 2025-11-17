@@ -1,0 +1,22 @@
+{
+  "name": "wikipedia-playwright-tests",
+  "version": "1.0.0",
+  "description": "End-to-end tests for Wikipedia, TodoMVC and DemoQA using best practices: Page Object Model, BDD-style test cases (Given-When-Then), fixtures, .env, mobile testing, accessibility checks and daily CI/CD with GitHub Actions schedule.",
+  "main": "index.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ipuiuna/wikipedia-playwright-tests.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ipuiuna/wikipedia-playwright-tests/issues"
+  },
+  "homepage": "https://github.com/ipuiuna/wikipedia-playwright-tests#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.56.1",
+    "@types/node": "^24.10.1"
+  }
+}
