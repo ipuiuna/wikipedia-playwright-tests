@@ -26,6 +26,16 @@ export class WikiPage {
 
   async search(term: string) {
     this.lastSearchTerm = term.trim();
+
+    // mobile icons may hide the search input behind a button
+    const searchTrigger = this.page.getByRole('button', {
+      name: /pesquisar|search|magnifying/i,
+    });
+
+    await searchTrigger.click({ timeout: 3000 }).catch(() => {
+      console.log('Search trigger not found or not needed.');
+    });
+
     await this.searchInput.fill(term);
     await this.searchButton.click();
   }
