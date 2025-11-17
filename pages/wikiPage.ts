@@ -1,25 +1,23 @@
-import { Page, Locator } from '@playwright/test';
+import { Page, Locator, expect } from '@playwright/test';
 
 export class WikiPage {
   readonly page: Page;
   readonly searchInput: Locator;
   readonly searchButton: Locator;
-  readonly firstSearchResult: Locator;
-  readonly noresults: Locator;
+  readonly noResults: Locator;
   readonly resultsContainer: Locator;
+  readonly searchResults: Locator;
+  private lastSearchTerm: string = '';
 
   constructor(page: Page) {
     this.page = page;
-    this.searchInput = page.getByRole('combobox', {
+    this.searchInput = page.getByRole('searchbox', {
       name: 'Pesquisar na Wikipédia',
     });
-    this.resultsContainer = this.page.locator('.mw-search-results');
+    this.resultsContainer = this.page.locator('ul.mw-search-results');
+    this.searchResults = this.resultsContainer.locator('li.mw-search-result');
     this.searchButton = page.getByRole('button', { name: 'Procurar' });
-    this.firstSearchResult = this.resultsContainer
-      .getByRole('listitem')
-      .first()
-      .getByRole('heading', { level: 3 });
-    this.noresults = page.locator('.mw-search-nonefound');
+    this.noResults = page.locator('.mw-search-nonefound');
   }
 
   async goto() {
@@ -27,11 +25,34 @@ export class WikiPage {
   }
 
   async search(term: string) {
+    this.lastSearchTerm = term.trim();
     await this.searchInput.fill(term);
     await this.searchButton.click();
   }
 
   async openFirstLink(): Promise<void> {
     await this.page.getByRole('heading', { level: 3 }).first().click();
+  }
+
+  async assertHasResults() {
+    await expect(this.searchResults).not.toHaveCount(0, { timeout: 10000 });
+  }
+
+  async assertNoResults() {
+    await expect(this.noResults).toBeVisible();
+  }
+
+  get firstSearchResult() {
+    const regex = new RegExp(this.lastSearchTerm.replace(/ /g, '\\s+'), 'i');
+    console.log('last search term: ', this.lastSearchTerm);
+    console.log('results container: ', this.resultsContainer);
+    return this.resultsContainer
+      .locator('li.mw-search-result')
+      .first()
+      .getByRole('link', { name: regex });
+  }
+
+  get firstRelevantResult() {
+    return this.page.locator('span.searchmatch').first().locator('..'); // up to <a>
   }
 }
