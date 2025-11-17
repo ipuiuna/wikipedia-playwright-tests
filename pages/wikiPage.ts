@@ -3,7 +3,6 @@ import { Page, Locator, expect } from '@playwright/test';
 export class WikiPage {
   readonly page: Page;
   readonly searchInput: Locator;
-  readonly searchButton: Locator;
   readonly noResults: Locator;
   readonly resultsContainer: Locator;
   readonly searchResults: Locator;
@@ -11,12 +10,12 @@ export class WikiPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.searchInput = page.getByRole('searchbox', {
-      name: 'Pesquisar na Wikipédia',
-    });
+    this.searchInput = page
+      .locator('input#searchInput, input[name="search"]')
+      .first();
+
     this.resultsContainer = this.page.locator('ul.mw-search-results');
     this.searchResults = this.resultsContainer.locator('li.mw-search-result');
-    this.searchButton = page.getByRole('button', { name: 'Procurar' });
     this.noResults = page.locator('.mw-search-nonefound');
   }
 
@@ -27,17 +26,16 @@ export class WikiPage {
   async search(term: string) {
     this.lastSearchTerm = term.trim();
 
-    // mobile icons may hide the search input behind a button
-    const searchTrigger = this.page.getByRole('button', {
-      name: /pesquisar|search|magnifying/i,
-    });
+    this.lastSearchTerm = term.trim();
 
-    await searchTrigger.click({ timeout: 3000 }).catch(() => {
-      console.log('Search trigger not found or not needed.');
-    });
-
+    // in mobile needs to click the search icon first
+    const searchIcon = this.page.locator('#searchIcon');
+    if (await searchIcon.isVisible({ timeout: 3000 })) {
+      await searchIcon.click();
+      await this.searchInput.waitFor({ state: 'visible', timeout: 5000 });
+    }
     await this.searchInput.fill(term);
-    await this.searchButton.click();
+    await this.searchInput.press('Enter');
   }
 
   async openFirstLink(): Promise<void> {
