@@ -12,9 +12,9 @@ Playwright automation portfolio project with BDD + daily CI/CD
 | TC04 | **Language switch**<br>**Given** the user is on the Portuguese homepage<br>**When** the user clicks the "English" link in the footer<br>**Then** the URL should contain "en.wikipedia.org" and the page title should change to "Wikipedia, the free encyclopedia" |
 | TC05 | **Mobile responsiveness**<br>**Given** the browser is in mobile viewport (Pixel 5)<br>**When** the user opens Wikipedia<br>**Then** the hamburger menu should be visible and functional                                                                           |
 
-> Only the first one are fully automated with Playwright  
-> Status: 1/5 Passed (updated daily via GitHub Actions)
-> 4 more to complete
+> TC01 / TC02 implemented
+> Status: 2/5 Passed (updated daily via GitHub Actions)
+> TC03 / TC04 / TC05 to be implemented
 
 [![Playwright Tests](https://github.com/ipuiuna/wikipedia-playwright-tests/actions/workflows/playwright.yml/badge.svg)](https://github.com/ipuiuna/wikipedia-playwright-tests/actions/workflows/playwright.yml)
 
