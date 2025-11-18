@@ -9,4 +9,10 @@ test.describe('Wikipedia Search Functionality', () => {
       ignoreCase: true,
     });
   });
+
+  test('TC02 - Search for a non-existing article', async ({ wikiPage }) => {
+    await wikiPage.search('asdkjasdkjasdasdkjasdkjasdkkkk');
+    await wikiPage.assertNoResults();
+    await expect(wikiPage.noResults).toBeVisible();
+  });
 });
