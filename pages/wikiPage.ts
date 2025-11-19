@@ -7,6 +7,19 @@ export class WikiPage {
   readonly resultsContainer: Locator;
   readonly searchResults: Locator;
   private lastSearchTerm: string = '';
+  readonly languageSelector: Locator;
+  private readonly languageMap: Record<string, string> = {
+    en: 'en',
+    english: 'en',
+    inglês: 'en',
+    es: 'es',
+    español: 'es',
+    espanhol: 'es',
+    pt: 'pt',
+    'pt-br': 'pt',
+    português: 'pt',
+    fr: 'fr',
+  };
 
   constructor(page: Page) {
     this.page = page;
@@ -17,6 +30,11 @@ export class WikiPage {
     this.resultsContainer = this.page.locator('ul.mw-search-results');
     this.searchResults = this.resultsContainer.locator('li.mw-search-result');
     this.noResults = page.locator('.mw-search-nonefound');
+    this.languageSelector = this.page
+      .getByRole('button', { name: /idioma|language|languages/i })
+      .or(this.page.locator('a.language-selector'))
+      .or(this.page.locator('#p-lang-btn-checkbox'))
+      .first();
   }
 
   async goto() {
@@ -45,8 +63,6 @@ export class WikiPage {
 
   get firstSearchResult() {
     const regex = new RegExp(this.lastSearchTerm.replace(/ /g, '\\s+'), 'i');
-    console.log('last search term: ', this.lastSearchTerm);
-    console.log('results container: ', this.resultsContainer);
     return this.resultsContainer
       .locator('li.mw-search-result')
       .first()
@@ -55,5 +71,62 @@ export class WikiPage {
 
   get firstRelevantResult() {
     return this.page.locator('span.searchmatch').first().locator('..'); // up to <a>
+  }
+
+  async changeLanguage(input: string) {
+    const normalized = input.toLowerCase().trim();
+    const code = this.languageMap[normalized];
+
+    if (!code)
+      throw new Error(`Language does not exists in languageMap: ${input}`);
+
+    const isMobile = (await this.page.viewportSize())?.width! < 700;
+
+    if (isMobile) {
+      const mobileButton = this.page.locator(
+        '#page-secondary-actions .language-selector.button'
+      );
+      await mobileButton.scrollIntoViewIfNeeded();
+      await mobileButton.click();
+      await this.page.waitForSelector('#p-lang', {
+        state: 'attached',
+        timeout: 5000,
+      });
+
+      const link = this.page.locator(`li a[lang="${code}"]`).first();
+      const isVisible = await link.isVisible().catch(() => false);
+
+      if (isVisible) {
+        await link.scrollIntoViewIfNeeded();
+        await link.click();
+      } else {
+        const href = await link.getAttribute('href');
+        if (!href) {
+          throw new Error(`Link for ${code} does not has a href`);
+        }
+        await this.page.goto(href);
+      }
+      await this.page.waitForURL(`**${code}.wikipedia.org**`, {
+        timeout: 10000,
+      });
+      return;
+    }
+
+    await this.languageSelector.click({ force: true });
+    await this.page.waitForSelector('li a[lang]', {
+      state: 'visible',
+      timeout: 5000,
+    });
+
+    const link = this.page.locator(`li a[lang="${code}"]`).first();
+
+    await link.scrollIntoViewIfNeeded();
+    await link.click({ force: true });
+    await this.page.waitForURL(`**${code}.wikipedia.org**`, {
+      timeout: 10000,
+    });
+    console.log(
+      `changing language to ${code} (${isMobile ? 'mobile' : 'desktop'})`
+    );
   }
 }
