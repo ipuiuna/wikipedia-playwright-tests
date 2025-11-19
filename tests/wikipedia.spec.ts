@@ -28,3 +28,14 @@ test.describe('Wikipedia Search Functionality', () => {
     await expect(wikiPage.page).toHaveURL(/Automa%C3%A7%C3%A3o_de_teste/);
   });
 });
+
+test.describe('Wikipedia Language Change', () => {
+  test('TC04 - Should switch interface language to English', async ({
+    wikiPage,
+  }) => {
+    await wikiPage.goto();
+    await wikiPage.changeLanguage('English');
+    await expect(wikiPage.page.url()).toContain('en.wikipedia.org');
+    await expect(wikiPage.page).toHaveTitle(/Wikipedia, the free encyclopedia/);
+  });
+});
