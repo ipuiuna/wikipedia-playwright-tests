@@ -3,7 +3,7 @@ import { WikiPage } from '../pages/wikiPage';
 
 type WikiFixtures = {
   wikiPage: WikiPage;
-  wikiSearch: WikiPage;
+  wikiSearchForJavaScript: WikiPage;
 };
 
 export const test = base.extend<WikiFixtures>({
@@ -13,10 +13,11 @@ export const test = base.extend<WikiFixtures>({
     await use(wiki);
   },
 
-  wikiSearch: async ({ page }, use, testInfo) => {
+  wikiSearchForJavaScript: async ({ page }, use) => {
     const wiki = new WikiPage(page);
     await page.goto('https://pt.wikipedia.org');
-    await wiki.search('Playwright');
+    await wiki.search('Linguagem JavaScript');
+    await wiki.assertHasResults();
     await use(wiki);
   },
 });

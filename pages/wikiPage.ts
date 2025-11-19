@@ -2,12 +2,13 @@ import { Page, Locator, expect } from '@playwright/test';
 
 export class WikiPage {
   readonly page: Page;
-  readonly searchInput: Locator;
+  private lastSearchTerm: string = '';
+  private readonly searchInput: Locator;
   readonly noResults: Locator;
   readonly resultsContainer: Locator;
-  readonly searchResults: Locator;
-  private lastSearchTerm: string = '';
-  readonly languageSelector: Locator;
+  private readonly searchResults: Locator;
+  private readonly languageSelector: Locator;
+
   private readonly languageMap: Record<string, string> = {
     en: 'en',
     english: 'en',
@@ -128,5 +129,29 @@ export class WikiPage {
     console.log(
       `changing language to ${code} (${isMobile ? 'mobile' : 'desktop'})`
     );
+  }
+
+  async checkIsDesktopOrMobile() {
+    const viewport = await this.page.viewportSize();
+
+    if (!viewport) {
+      throw new Error('Viewport size is undefined');
+    }
+
+    const isMobile = viewport.width < 700 ? true : false;
+
+    if (isMobile) {
+      const hamburger = this.page.locator('label[for="main-menu-input"]');
+      await hamburger.click({ force: true });
+
+      await expect(this.page.getByRole('link', { name: 'Início' })).toBeVisible(
+        { timeout: 5000 }
+      );
+      await hamburger.click({ force: true });
+    } else {
+      const mainMenu = this.page.locator('#vector-main-menu-dropdown');
+      await expect(mainMenu).toBeVisible({ timeout: 5000 });
+    }
+    console.log('Device: ', isMobile ? 'Mobile' : 'Desktop');
   }
 }
