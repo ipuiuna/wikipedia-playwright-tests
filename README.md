@@ -17,7 +17,7 @@ Playwright automation project with BDD + weekly CI/CD
 ![Stability](https://img.shields.io/badge/Stability-100%25-brightgreen)
 
 - Automated tests with Playwright running **weekly** (every Monday at 06:00 BRT)
-- Full HTML report: https://github.com/ipuiuna/wikipedia-playwright-tests
+- Full HTML report: [Git Actions](https://github.com/ipuiuna/wikipedia-playwright-tests/actions/workflows/playwright.yml)
 
 ## How to Run Locally
 
