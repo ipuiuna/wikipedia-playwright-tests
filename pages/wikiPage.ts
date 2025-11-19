@@ -25,9 +25,6 @@ export class WikiPage {
 
   async search(term: string) {
     this.lastSearchTerm = term.trim();
-
-    this.lastSearchTerm = term.trim();
-
     // in mobile needs to click the search icon first
     const searchIcon = this.page.locator('#searchIcon');
     if (await searchIcon.isVisible({ timeout: 3000 })) {
@@ -36,10 +33,6 @@ export class WikiPage {
     }
     await this.searchInput.fill(term);
     await this.searchInput.press('Enter');
-  }
-
-  async openFirstLink(): Promise<void> {
-    await this.page.getByRole('heading', { level: 3 }).first().click();
   }
 
   async assertHasResults() {
